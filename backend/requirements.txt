@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+playwright
+pandas
+duckduckgo-search
+openpyxl
+gspread

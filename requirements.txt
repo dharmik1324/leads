@@ -1,6 +1,0 @@
-playwright
-streamlit
-pandas
-duckduckgo-search
-openpyxl
-gspread

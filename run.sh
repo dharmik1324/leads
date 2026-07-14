@@ -10,6 +10,12 @@ else
     exit 1
 fi
 
-# Run the Streamlit application (serves both frontend and backend)
-echo "Starting LeadScout AI (Frontend & Backend)..."
-streamlit run app.py
+# Build the frontend if not already compiled
+if [ ! -d "frontend/dist" ]; then
+    echo "Compiling Vite frontend..."
+    cd frontend && npm run build && cd ..
+fi
+
+# Run the FastAPI server (which serves both the API and the static frontend)
+echo "Starting LeadScout AI on http://127.0.0.1:8000..."
+uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload

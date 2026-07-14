@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadScout AI</title>
+    <!-- Google Fonts: Outfit (modern sans-serif) & JetBrains Mono (for terminal) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome for high-quality icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <script type="module" src="/src/main.js"></script>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header animate-fade-in">
+            <div class="logo-wrapper justify-between w-full">
+                <img src="logo_transparent.png" alt="LeadScout AI Logo" class="app-logo">
+                <button id="theme-toggle-btn" class="btn btn-secondary theme-toggle-btn" title="Toggle Light/Dark Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace Grid -->
+        <main class="workspace-grid">
+            <!-- Left Side: Configuration Card -->
+            <section class="card config-card animate-slide-in">
+                <div class="card-header">
+                    <i class="fa-solid fa-sliders card-icon"></i>
+                    <h2>Search Settings</h2>
+                </div>
+
+                <form id="scrape-form" class="form-layout">
+                    <div class="input-group">
+                        <label for="search-query">Search Query</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-magnifying-glass field-icon"></i>
+                            <input type="text" id="search-query" placeholder="e.g. Plumbers in Dallas" required>
+                        </div>
+                        <span class="help-text">What type of businesses and location do you want to scan?</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="search-limit">Max Scan Limit</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-list-ol field-icon"></i>
+                            <input type="number" id="search-limit" min="1" max="500" value="20" required>
+                        </div>
+                        <span class="help-text">Number of Google Maps search results to evaluate.</span>
+                    </div>
+
+                    <div class="actions-row">
+                        <button type="submit" id="start-btn" class="btn btn-primary btn-glow">
+                            <span class="btn-text">Start Scraping Agent</span>
+                            <i class="fa-solid fa-play btn-icon"></i>
+                        </button>
+                        <button type="button" id="stop-btn" class="btn btn-danger hide" title="Stop Agent">
+                            <i class="fa-solid fa-stop"></i>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Right Side: Terminal / Console Logs Card -->
+            <section class="card terminal-card animate-slide-in-delay">
+                <div class="card-header justify-between">
+                    <div class="flex-align">
+                        <i class="fa-solid fa-terminal card-icon text-purple"></i>
+                        <h2>Agent Terminal Console</h2>
+                    </div>
+                    <div id="status-badge" class="badge badge-idle">
+                        <span class="dot"></span>
+                        <span class="badge-text">System Idle</span>
+                    </div>
+                </div>
+
+                <div class="terminal-body" id="terminal-console">
+                    <div class="terminal-line info">&gt; System: Console ready.</div>
+                    <div class="terminal-line info">&gt; Enter search parameters on the left and click "Start Scraping
+                        Agent".</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Dynamic Results Section (Visible only when scraping starts or finishes) -->
+        <section id="results-section" class="results-container hide animate-fade-in">
+            <!-- Stats Dashboard -->
+            <div class="metrics-grid">
+                <div class="card metric-card">
+                    <div class="metric-header">
+                        <i class="fa-solid fa-eye metric-icon"></i>
+                        <span class="metric-label">Businesses Evaluated</span>
+                    </div>
+                    <div class="metric-value" id="stat-evaluated">0</div>
+                </div>
+
+                <div class="card metric-card border-purple">
+                    <div class="metric-header">
+                        <i class="fa-solid fa-address-book metric-icon text-purple"></i>
+                        <span class="metric-label">Website-less Leads Found</span>
+                    </div>
+                    <div class="metric-value text-gradient-purple" id="stat-leads-found">0</div>
+                </div>
+
+                <div class="card metric-card">
+                    <div class="metric-header">
+                        <i class="fa-solid fa-envelope metric-icon text-blue"></i>
+                        <span class="metric-label">Emails Extracted</span>
+                    </div>
+                    <div class="metric-value text-gradient-blue" id="stat-emails">0</div>
+                </div>
+            </div>
+
+            <!-- Table of Leads -->
+            <div class="card table-card">
+                <div class="card-header justify-between">
+                    <div class="flex-align">
+                        <i class="fa-solid fa-table card-icon"></i>
+                        <h2>Scraped Leads</h2>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="actions-group">
+                        <button id="download-csv-btn" class="btn btn-secondary" disabled>
+                            <i class="fa-solid fa-file-csv"></i>
+                            Download CSV
+                        </button>
+                        <button id="open-export-modal-btn" class="btn btn-primary" disabled>
+                            <i class="fa-brands fa-google-drive"></i>
+                            Export to Google Sheets
+                        </button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="input-wrapper filter-wrapper">
+                        <i class="fa-solid fa-filter field-icon"></i>
+                        <input type="text" id="location-filter"
+                            placeholder="Filter results by location (e.g. Surat, Texas)...">
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="leads-table">
+                        <thead>
+                            <tr>
+                                <th>Business Name</th>
+                                <th>Phone Number</th>
+                                <th>Address</th>
+                                <th>Email Addresses</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-table-body">
+                            <tr>
+                                <td colspan="4" class="empty-table-msg">
+                                    <i class="fa-solid fa-box-open"></i> No leads found yet.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Export Modal Dialog -->
+    <div id="export-modal" class="modal-overlay hide">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h2>Export to Google Sheets</h2>
+                <button class="close-modal-btn" id="close-modal-btn">&times;</button>
+            </div>
+
+            <form id="export-form" class="form-layout">
+                <div class="input-group">
+                    <label for="sheet-name-input">Spreadsheet Name</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-file-excel field-icon"></i>
+                        <input type="text" id="sheet-name-input" placeholder="e.g. My Google Sheet" required>
+                    </div>
+                    <span class="help-text">The Google Sheet must already exist and be shared with your Service Account
+                        email.</span>
+                </div>
+
+                <div class="input-group">
+                    <label for="worksheet-name-input">Worksheet Tab Name</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-table-list field-icon"></i>
+                        <input type="text" id="worksheet-name-input" value="Sheet1" required>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-export-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="confirm-export-btn">
+                        <span>Export Now</span>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+
+            <div id="modal-console" class="terminal-body hide">
+                <!-- Google sheet export logs will render here -->
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
