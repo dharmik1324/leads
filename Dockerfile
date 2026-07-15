@@ -34,5 +34,6 @@ COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 # Expose FastAPI's default port
 EXPOSE 8000
 
-# Command to run the application
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Command to run the application using the dynamic PORT environment variable
+CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+
