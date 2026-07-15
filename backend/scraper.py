@@ -288,8 +288,8 @@ def scrape_maps_leads(query, max_results=20, log_callback=None, stop_check_callb
         )
         page = context.new_page()
         
-        # Block images, media, fonts, and stylesheets (CSS) to minimize RAM usage to the absolute limit
-        page.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font", "stylesheet"] else route.continue_())
+        # Block images, media, and fonts to speed up page loading significantly
+        page.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
         
         log_callback(f"Opening Google Maps search URL: {url}")
         page.goto(url)
