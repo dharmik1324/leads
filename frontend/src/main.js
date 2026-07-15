@@ -1,6 +1,6 @@
 import './style.css';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+const API_BASE = "https://leads-kjne.onrender.com";
 
 document.addEventListener("DOMContentLoaded", () => {
     // Form and Scrape elements
@@ -262,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
 
             currentTaskId = data.task_id;
-            
+
             // Start polling status
             pollInterval = setInterval(pollStatus, 1000);
         } catch (err) {
@@ -355,7 +355,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 successDiv.className = "terminal-line success";
                 successDiv.textContent = "> Completed successfully! You can close this window.";
                 modalConsole.appendChild(successDiv);
-                
+
                 // Keep Cancel/Close button enabled to let user close
                 document.getElementById("cancel-export-btn").disabled = false;
                 document.getElementById("cancel-export-btn").textContent = "Done";
@@ -370,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
             errDiv.className = "terminal-line error";
             errDiv.textContent = `> Connection failed: ${err.message}`;
             modalConsole.appendChild(errDiv);
-            
+
             document.getElementById("cancel-export-btn").disabled = false;
             document.getElementById("confirm-export-btn").disabled = false;
             sheetNameInput.disabled = false;
@@ -396,10 +396,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Stop scraping task
     stopBtn.addEventListener("click", async () => {
         if (!currentTaskId) return;
-        
+
         stopBtn.disabled = true;
         stopBtn.querySelector("i").className = "fa-solid fa-circle-notch fa-spin";
-        
+
         try {
             const res = await fetch(`${API_BASE}/api/stop/${currentTaskId}`, {
                 method: "POST"
@@ -415,7 +415,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Theme toggle controller
     const themeToggleBtn = document.getElementById("theme-toggle-btn");
-    
+
     // Load persisted theme preference
     if (localStorage.getItem("theme") === "light") {
         document.documentElement.classList.add("light-theme");
