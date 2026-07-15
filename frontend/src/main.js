@@ -1,6 +1,6 @@
 import './style.css';
 
-const API_BASE = import.meta.env.DEV ? "" : "https://leads-kjne.onrender.com";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
 
 document.addEventListener("DOMContentLoaded", () => {
     // Form and Scrape elements
