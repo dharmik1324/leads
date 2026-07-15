@@ -268,15 +268,28 @@ def scrape_maps_leads(query, max_results=20, log_callback=None, stop_check_callb
     
     log_callback("Starting browser automation...")
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        # Launch Chromium with low-memory and speed-optimized arguments
+        browser = p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-accelerated-2d-canvas",
+                "--no-first-run",
+                "--no-zygote",
+                "--single-process", # Reduces multiple Chromium process memory footprints
+                "--disable-gpu"
+            ]
+        )
         context = browser.new_context(
             user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             viewport={"width": 1280, "height": 800}
         )
         page = context.new_page()
         
-        # Block images, media, and fonts to speed up page loading significantly
-        page.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font"] else route.continue_())
+        # Block images, media, fonts, and stylesheets (CSS) to minimize RAM usage to the absolute limit
+        page.route("**/*", lambda route: route.abort() if route.request.resource_type in ["image", "media", "font", "stylesheet"] else route.continue_())
         
         log_callback(f"Opening Google Maps search URL: {url}")
         page.goto(url)
