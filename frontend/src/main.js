@@ -1,5 +1,7 @@
 import './style.css';
 
+const API_BASE = import.meta.env.DEV ? "" : "https://leads-kjne.onrender.com";
+
 document.addEventListener("DOMContentLoaded", () => {
     // Form and Scrape elements
     const scrapeForm = document.getElementById("scrape-form");
@@ -183,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Polling function
     async function pollStatus() {
         try {
-            const res = await fetch(`/api/status/${currentTaskId}`);
+            const res = await fetch(`${API_BASE}/api/status/${currentTaskId}`);
             if (!res.ok) throw new Error("Failed to fetch task status.");
             const data = await res.json();
 
@@ -250,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateBadge("running");
 
         try {
-            const res = await fetch("/api/scrape", {
+            const res = await fetch(`${API_BASE}/api/scrape`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ query, limit })
@@ -276,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Download CSV Action
     downloadCsvBtn.addEventListener("click", () => {
         if (!currentTaskId) return;
-        window.location.href = `/api/download/${currentTaskId}`;
+        window.location.href = `${API_BASE}/api/download/${currentTaskId}`;
     });
 
     // --- Modal Export Controller ---
@@ -325,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("cancel-export-btn").disabled = true;
 
         try {
-            const res = await fetch("/api/export", {
+            const res = await fetch(`${API_BASE}/api/export`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -399,7 +401,7 @@ document.addEventListener("DOMContentLoaded", () => {
         stopBtn.querySelector("i").className = "fa-solid fa-circle-notch fa-spin";
         
         try {
-            const res = await fetch(`/api/stop/${currentTaskId}`, {
+            const res = await fetch(`${API_BASE}/api/stop/${currentTaskId}`, {
                 method: "POST"
             });
             if (!res.ok) throw new Error("Stop request failed.");
